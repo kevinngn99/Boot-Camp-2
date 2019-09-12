@@ -1,28 +1,53 @@
 'use strict';
-/* 
-  Import modules/files you may need to correctly run the script. 
-  Make sure to save your DB's uri in the config file, then import it with a require statement!
- */
+
 var fs = require('fs'),
     mongoose = require('mongoose'), 
     Schema = mongoose.Schema, 
     Listing = require('./ListingSchema.js'), 
-    config = require('./config');
+    config = require('./config'),
+    listingData;
 
-/* Connect to your database using mongoose - remember to keep your key secret*/
-//see https://mongoosejs.com/docs/connections.html
-//See https://docs.atlas.mongodb.com/driver-connection/
+mongoose.connect(config.db.uri, { useNewUrlParser: true });
 
-/* 
-  Instantiate a mongoose model for each listing object in the JSON file, 
-  and then save it to your Mongo database 
-  //see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+fs.readFile('listings.json', 'utf8', function(error, data) {
+  if (error) {
+    throw error;
+  }
 
-  Remember that we needed to read in a file like we did in Bootcamp Assignment #1.
- */
+  listingData = JSON.parse(data);
 
+  for (var i = 0; i < listingData.entries.length; i++) {
+    /*if (listingData.entries[i].code) {
+      var cde = listingData.entries[i].code;
+      console.log("Code: %s", cde);
+    }
 
-/*  
-  Check to see if it works: Once you've written + run the script, check out your MongoLab database to ensure that 
-  it saved everything correctly. 
- */
+    if (listingData.entries[i].name) {
+      var nme = listingData.entries[i].name;
+      console.log("Name: %s", nme);
+    }
+
+    if (listingData.entries[i].coordinates) {
+      var lat = listingData.entries[i].coordinates['latitude'];
+      var long = listingData.entries[i].coordinates['longitude'];
+      console.log("Latitude: %d", lat);
+      console.log("Longitude: %d", long);
+    }
+
+    if (listingData.entries[i].address) {
+      var addr = listingData.entries[i].address;
+      console.log("Address: %s", addr);
+    }
+
+    console.log();*/
+
+    var list = new Listing({
+      code: listingData.entries[i].code,
+      name: listingData.entries[i].name,
+      coordinates: listingData.entries[i].coordinates,
+      address: listingData.entries[i].address,
+    });
+
+    list.save();
+  }
+});

@@ -1,36 +1,105 @@
-/* Add all the required libraries*/
+var mongoose = require('mongoose');
+var Listing = require('./ListingSchema.js');
+var config = require('./config');
 
-/* Connect to your database using mongoose - remember to keep your key secret*/
-
-/* Fill out these functions using Mongoose queries*/
-//Check out - https://mongoosejs.com/docs/queries.html
+mongoose.set('useFindAndModify', false);
+mongoose.connect(config.db.uri, { useNewUrlParser: true });
 
 var findLibraryWest = function() {
-  /* 
-    Find the document that contains data corresponding to Library West,
-    then log it to the console. 
-   */
+  Listing.findOne({'code' : 'LBW'}, function(err, query) {
+    if (err) {
+      throw err;
+    }
+    else {
+      console.log('---------------------------------------Find LBW---------------------------------------');
+
+      if (query.code) {
+        var cde = query.code;
+        console.log("Code: %s", cde);
+      }
+
+      if (query.name) {
+        var nme = query.name;
+        console.log("Name: %s", nme);
+      }
+
+      if (query.coordinates) {
+        var lat = query.coordinates.latitude;
+        var long = query.coordinates.longitude;
+        console.log("Latitude: %d", lat);
+        console.log("Longitude: %d", long);
+      }
+
+      if (query.address) {
+        var addr = query.address;
+        console.log("Address: %s", addr);
+      }
+    }
+  });
 };
+
 var removeCable = function() {
-  /*
-    Find the document with the code 'CABL'. This cooresponds with courses that can only be viewed 
-    on cable TV. Since we live in the 21st century and most courses are now web based, go ahead
-    and remove this listing from your database and log the document to the console. 
-   */
+  Listing.findOneAndRemove({'code' : 'CABL'}, function(err) {
+    if (err) {
+      throw err;
+    }
+    else {
+      console.log('--------------------------------------Remove CABL-------------------------------------');
+      console.log('Removing CABL from listings...');
+    }
+  });
 };
+
 var updatePhelpsLab = function() {
-  /*
-    Phelps Lab address is incorrect. Find the listing, update it, and then 
-    log the updated document to the console. 
-   */
+  Listing.findOneAndUpdate({'code' : 'PHL'}, {'address' : '1953 Museum Rd, Gainesville, FL 32603, United States'}, function(err, query) {
+    if (err) {
+      throw err;
+    }
+    else {
+      console.log('--------------------------------------Update PHL--------------------------------------');
+      console.log('Updating PHL from listings...');
+    }
+  });
 };
+
 var retrieveAllListings = function() {
-  /* 
-    Retrieve all listings in the database, and log them to the console. 
-   */
+  Listing.find({}, function(err, queries) {
+    if (err) {
+      throw err;
+    }
+    else {
+      console.log('---------------------------------------Find All---------------------------------------');
+
+      queries.forEach(function(query) {
+        if (query.code) {
+          var cde = query.code;
+          console.log("Code: %s", cde);
+        }
+  
+        if (query.name) {
+          var nme = query.name;
+          console.log("Name: %s", nme);
+        }
+  
+        if (query.coordinates.latitude && query.coordinates.latitude) {
+          var lat = query.coordinates.latitude;
+          var long = query.coordinates.longitude;
+          console.log("Latitude: %d", lat);
+          console.log("Longitude: %d", long);
+        }
+  
+        if (query.address) {
+          var addr = query.address;
+          console.log("Address: %s", addr);
+        }
+
+        console.log();
+      });
+    }
+  });
 };
 
 findLibraryWest();
 removeCable();
-updatePhelpsMemorial();
+updatePhelpsLab();
 retrieveAllListings();
